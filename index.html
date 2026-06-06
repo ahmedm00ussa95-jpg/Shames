@@ -1653,26 +1653,48 @@
 <div class="loading" id="loading"><div class="loading-icon">💻</div><h2>الشمس - Al Shams ERP</h2><p>جارٍ تحميل النظام...</p><div class="loading-bar"><div class="loading-fill"></div></div></div>
 <div id="inv-print-area"></div>
 <script type="module">
-  try{
-    const{initializeApp}=await import("https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js");
-    const{getDatabase,ref,set,push,update,remove,onValue}=await import("https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js");
-    const app=initializeApp({databaseURL:"https://carpet-a36a8-default-rtdb.firebaseio.com"});
-    const db=getDatabase(app);
-    window.$db=db;window.$ref=ref;window.$set=set;window.$push=push;
-    window.$update=update;window.$remove=remove;window.$onValue=onValue;
-    window._fbAvailable=true;
-    window.dispatchEvent(new Event('fbReady'));
-  }catch(e){
-    console.error('Firebase error:',e);
-    // عرض رسالة خطأ واضحة بدلاً من الانتقال لوضع أوف لاين
-    const lp=document.getElementById('loading-msg');
-    if(lp)lp.textContent='خطأ في الاتصال بالسحابة — يرجى التحقق من الاتصال بالإنترنت وإعادة تحميل الصفحة';
-    const lp2=document.getElementById('loading');
-    if(lp2){
-      const errDiv=document.createElement('div');
-      errDiv.style.cssText='margin-top:16px;background:#f851491a;border:1px solid #f85149;border-radius:10px;padding:12px 20px;font-size:12px;color:#f85149;text-align:center;max-width:380px;';
-      errDiv.innerHTML='<i class="fas fa-wifi" style="font-size:20px;display:block;margin-bottom:8px;"></i>تعذّر الاتصال بقاعدة البيانات السحابية<br><br><button onclick="location.reload()" style="background:#f85149;color:#fff;border:none;border-radius:7px;padding:7px 20px;font-family:Cairo,sans-serif;font-size:12px;font-weight:700;cursor:pointer;margin-top:4px;">إعادة المحاولة</button>';
-      lp2.appendChild(errDiv);
+  try {
+    const { initializeApp }                              = await import("https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js");
+    const { getDatabase, ref, set, push, update, remove, onValue } = await import("https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js");
+
+    const app = initializeApp({
+      apiKey: "AIzaSyDemoKeyReplaceWithYours",
+      databaseURL: "https://carpet-a36a8-default-rtdb.firebaseio.com"
+    });
+    const db = getDatabase(app);
+
+    // Expose globally BEFORE firing event
+    window.$db      = db;
+    window.$ref     = ref;
+    window.$set     = set;
+    window.$push    = push;
+    window.$update  = update;
+    window.$remove  = remove;
+    window.$onValue = onValue;
+    window._fbAvailable = true;
+
+    // Wait for all scripts to load, then fire fbReady
+    function fireFbReady() {
+      window.dispatchEvent(new Event('fbReady'));
+    }
+
+    if (document.readyState === 'complete') {
+      setTimeout(fireFbReady, 100);
+    } else {
+      window.addEventListener('load', () => setTimeout(fireFbReady, 100));
+    }
+
+  } catch(e) {
+    console.error('Firebase error:', e);
+    const loading = document.getElementById('loading');
+    if (loading) {
+      loading.innerHTML = `
+        <div style="text-align:center;padding:30px;">
+          <div style="font-size:48px;margin-bottom:16px;">⚠️</div>
+          <div style="font-size:16px;font-weight:700;color:#f85149;margin-bottom:8px;">خطأ في الاتصال بقاعدة البيانات</div>
+          <div style="font-size:12px;color:#888;margin-bottom:20px;">${e.message}</div>
+          <button onclick="location.reload()" style="background:#00d4ff;color:#fff;border:none;border-radius:8px;padding:10px 24px;font-family:Cairo,sans-serif;font-size:14px;font-weight:700;cursor:pointer;">🔄 إعادة المحاولة</button>
+        </div>`;
     }
   }
 </script>
